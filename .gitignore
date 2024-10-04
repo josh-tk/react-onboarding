@@ -1,0 +1,79 @@
+### Language and frameworks ###
+### Reduced version to suit all use cases as it is a template ###
+
+# Basics
+*.py[cod]
+__pycache__
+.python-version
+
+# pip-compile
+src/
+
+# Patches
+*.patch
+
+# Logs
+*.log
+pip-log.txt
+
+# npm
+node_modules/
+
+### Text Editors and IDEs
+# Pycharm
+.idea/*
+.run/
+!.idea/runConfigurations
+
+# Vim
+*~
+*.swp
+*.swo
+.vim
+
+# Ignore tags created by etags, ctags, gtags (GNU global) and cscope
+TAGS
+.TAGS
+!TAGS/
+tags
+.tags
+!tags/
+gtags.files
+GTAGS
+GRTAGS
+GPATH
+GSYMS
+cscope.files
+cscope.out
+cscope.in.out
+cscope.po.out
+
+# SonarQube
+.scannerwork/
+
+locale
+coverage.xml
+.coverage.*
+
+# OS specific
+.DS_Store
+
+# mypy
+.mypy_cache
+
+# docker-compose file
+/docker-compose.yml
+
+# Generated in CI/CD systems
+git-added-files-last-commit
+
+# Local versions of docker-compose.yml
+/docker-compose-local.yml
+
+# test files
+**/test/**
+**/*test*/**
+**/test
+**/tests
+**/.test/*
+**/.tests/*
