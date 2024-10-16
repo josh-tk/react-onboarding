@@ -32,7 +32,7 @@ const RecipeList = (): JSX.Element => {
     }
 
     if (recipes.length === 0 && loading === false) {
-        return <p>No recipes found. Create one.</p>;
+        return <p>No recipes found. <a href="/recipes/create">Create one.</a></p>;
     }
 
     return (

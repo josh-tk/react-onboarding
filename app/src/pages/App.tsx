@@ -2,6 +2,7 @@
 import React, {ReactElement} from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import RecipeList from "./recipes/index";
+import CreateRecipe from "./recipes/create";
 
 const App: React.FC = (): ReactElement => {
     return (
@@ -9,6 +10,7 @@ const App: React.FC = (): ReactElement => {
             <Routes>
                 {/*<Route path="/" element={<Home />} />*/}
                 <Route path="/recipes" element={<RecipeList />}></Route>
+                <Route path="/recipes/create" element={<CreateRecipe />}></Route>
             </Routes>
         </Router>
     );
