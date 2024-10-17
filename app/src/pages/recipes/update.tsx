@@ -1,17 +1,18 @@
-import React, {useEffect, useState} from 'react';
-import {OptionType} from '../../interfaces';
+import React, {ReactElement, useEffect, useState} from 'react';
+import {AuthorType, IngredientType, OptionType, ShowRecipeType, UpdateRecipeForm} from '../../interfaces';
 import {UpdateRecipeSchema} from "../../schemas";
 import {ErrorMessage, Field, Form, Formik} from 'formik';
 import SelectInput from "../../components/Select";
 import axios from "axios";
 import Loading from "../../components/Loading";
+import {authorToSelectOption, toSelectOptions} from "../../formatters";
 
-const UpdateRecipe = () => {
-    const [selectedRecipe, setSelectedRecipe] = useState(null);
-    const [ingredients, setIngredients] = useState([]);
-    const [authors, setAuthors] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [greatSuccess, setGreatSuccess] = useState(false);
+const UpdateRecipe = (): ReactElement => {
+    const [selectedRecipe, setSelectedRecipe] = useState<ShowRecipeType>(null);
+    const [ingredients, setIngredients] = useState<IngredientType[]>([]);
+    const [authors, setAuthors] = useState<AuthorType[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [greatSuccess, setGreatSuccess] = useState<boolean>(false);
 
     useEffect(() => {
         const recipeId = window.location.pathname.split('/').pop();
@@ -33,14 +34,14 @@ const UpdateRecipe = () => {
 
         axios.get(`${process.env.REACT_APP_BACKEND_API_HOST}/ingredients/list`)
             .then(response => {
-                setIngredients(formatForSelect(response.data.ingredients));
+                setIngredients(response.data.ingredients);
             }).catch(error => {
             console.error(error);
         });
 
         axios.get(`${process.env.REACT_APP_BACKEND_API_HOST}/users/list`)
             .then(response => {
-                setAuthors(formatForSelect(response.data.users));
+                setAuthors(response.data.users);
             })
             .catch(error => {
                 console.error(error);
@@ -53,7 +54,7 @@ const UpdateRecipe = () => {
         }
     }, [selectedRecipe, loading]);
 
-    const handleSelectIngredient = (setFieldValue, selectedOptions: OptionType[]) => {
+    const handleSelectIngredient = (setFieldValue: Function, selectedOptions: OptionType[]): void => {
         // ensure Formik knows that we've selected a couple options in our custom select component
         // remap the keys since our select component expects a specific shape different to our API payload
         let selectedIngredients = selectedOptions.map(option => {
@@ -65,28 +66,15 @@ const UpdateRecipe = () => {
 
         setFieldValue('ingredients', selectedIngredients);
     }
-    const handleSelectAuthor = (setFieldValue, selectedOption: OptionType) => {
+    const handleSelectAuthor = (setFieldValue: Function, selectedOption: OptionType): void => {
         // ensure Formik knows that we've selected an author in our custom select component
         setFieldValue('author_id', selectedOption.value);
     }
 
-    const formatForSelect = (data: any) => {
-        return data.map(resource => {
-            return {
-                value: resource.id,
-                label: resource.name
-            }
-        })
-    }
-
-    const formatAuthorForSelect = (author_id) => {
-        return authors.find(author => author.value === author_id);
-    }
-
-    const handleUpdateRecipe = (values) => {
-        axios.post(`${process.env.REACT_APP_BACKEND_API_HOST}/recipes/update`, values)
+    const handleUpdateRecipe = (values: UpdateRecipeForm) => {
+        axios.patch(`${process.env.REACT_APP_BACKEND_API_HOST}/recipes/update`, values)
             .then(response => {
-                if (response.status === 201) {
+                if (response.status === 200) {
                     setGreatSuccess(true);
                 }
             })
@@ -120,7 +108,7 @@ const UpdateRecipe = () => {
                     author_id: selectedRecipe.author.id
                 }}
                 validationSchema={UpdateRecipeSchema}
-                onSubmit={(values) => handleUpdateRecipe(values)}
+                onSubmit={(values: UpdateRecipeForm) => handleUpdateRecipe(values)}
             >
                 {(formik) => (
                     <Form>
@@ -132,11 +120,11 @@ const UpdateRecipe = () => {
 
                         <div>
                             <SelectInput
-                                options={ingredients}
+                                options={toSelectOptions(ingredients)}
                                 label={'Ingredients'}
                                 inputName={'ingredients'}
                                 isMulti={true}
-                                selectedOption={formatForSelect(formik.values.ingredients)}
+                                selectedOption={toSelectOptions(formik.values.ingredients)}
                                 setSelectedOption={
                                     (selectedOptions: OptionType[]) => handleSelectIngredient(formik.setFieldValue, selectedOptions)
                                 }
@@ -145,10 +133,10 @@ const UpdateRecipe = () => {
 
                         <div>
                             <SelectInput
-                                options={authors}
+                                options={toSelectOptions(authors)}
                                 label={'Author'}
                                 inputName={'author'}
-                                selectedOption={formatAuthorForSelect(formik.values.author_id)}
+                                selectedOption={authorToSelectOption(formik.values.author_id, authors)}
                                 setSelectedOption={
                                     (selectedOption: OptionType) => handleSelectAuthor(formik.setFieldValue, selectedOption)
                                 }
