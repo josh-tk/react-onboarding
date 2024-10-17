@@ -6,8 +6,9 @@ import SelectInput from "../../components/Select";
 import Loading from "../../components/Loading";
 import {authorToSelectOption, toSelectOptions} from "../../formatters";
 import {showRecipe, updateRecipe} from "../../http/recipes";
-import {indexUsers} from "../../http/users";
+import useHandleError from "../../http/handleError";
 import {indexIngredients} from "../../http/ingredients";
+import {indexUsers} from "../../http/users";
 
 const UpdateRecipe = (): ReactElement => {
     const [selectedRecipe, setSelectedRecipe] = useState<ShowRecipeType>(null);
@@ -15,31 +16,40 @@ const UpdateRecipe = (): ReactElement => {
     const [authors, setAuthors] = useState<AuthorType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [greatSuccess, setGreatSuccess] = useState<boolean>(false);
+    const {handleError} = useHandleError();
 
     useEffect(() => {
+        if (!loading) {
+            return;
+        }
+
         const recipeId = window.location.pathname.split('/').pop();
 
         // todo: client side 404 page
         if (recipeId === null) {
-            return;
+            handleError(404);
         }
 
+        // fetch the recipe, ingredients and authors
+        // if it fails, delegate to the error handler
+        // had to define the error handler here because
+        // you need to use the hook in a component
         showRecipe(
             recipeId,
             (data: ShowRecipeType) => setSelectedRecipe(data),
-            () => console.error('error')
+            (errorCode: number) => handleError(errorCode)
         );
 
         indexIngredients(
             (data: IngredientType[]) => setIngredients(data),
-            () => console.error('error')
+            (errorCode: number) => handleError(errorCode)
         );
 
         indexUsers(
             (data: AuthorType[]) => setAuthors(data),
-            () => console.error('error')
+            (errorCode: number) => handleError(errorCode)
         )
-    }, []);
+    }, [loading]);
 
     useEffect(() => {
         if (selectedRecipe !== null && loading) {

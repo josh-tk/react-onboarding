@@ -8,6 +8,7 @@ import {authorToSelectOption, fromSelectOptions, toSelectOptions} from "../../fo
 import {createRecipe} from "../../http/recipes";
 import {indexIngredients} from "../../http/ingredients";
 import {indexUsers} from "../../http/users";
+import useHandleError from "../../http/handleError";
 
 const CreateRecipe = (): ReactElement => {
     // add types here
@@ -15,20 +16,20 @@ const CreateRecipe = (): ReactElement => {
     const [authors, setAuthors] = useState<AuthorType[]>([]);
     const [loading, setLoading] = useState(true);
     const [greatSuccess, setGreatSuccess] = useState(false);
+    const {handleError} = useHandleError();
 
     useEffect(() => {
         indexIngredients(
             (data: IngredientType[]) => setIngredients(data),
-            () => console.error('error -> ', 'error')
+            (errorCode: number) => handleError(errorCode)
         );
 
         indexUsers(
             (data: AuthorType[]) => setAuthors(data),
-            () => console.error('error -> ', 'error')
+            (errorCode: number) => handleError(errorCode)
         );
-    }, []);
+    }, [handleError]);
 
-    //todo: check if theres no error and null check instead of length check
     useEffect(() => {
         if (ingredients.length > 0 && authors.length > 0) {
             setLoading(false);

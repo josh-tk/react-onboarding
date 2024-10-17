@@ -4,11 +4,11 @@ import axios from "axios";
 const showRecipe = (recipe_id: string, successCallback: Function, errorCallback: Function | null) => {
     axios.get(`${process.env.REACT_APP_BACKEND_API_HOST}/recipes/${recipe_id}`)
         .then(response => {
-            successCallback(response.data.recipe);
+            successCallback(response.data);
         })
         .catch(error => {
             console.error(error);
-            errorCallback && errorCallback();
+            errorCallback && errorCallback(error.status);
         });
 };
 
@@ -19,7 +19,7 @@ const indexRecipes = (successCallback: Function, errorCallback: Function | null)
         })
         .catch(error => {
             console.error(error);
-            errorCallback && errorCallback();
+            errorCallback && errorCallback(error.status);
         });
 };
 
@@ -32,7 +32,7 @@ const updateRecipe = (payload: UpdateRecipeForm, successCallback: Function, erro
         })
         .catch(error => {
             console.error(error);
-            errorCallback && errorCallback();
+            errorCallback && errorCallback(error.status);
         })
 };
 
@@ -45,7 +45,7 @@ const createRecipe = (payload: CreateRecipeForm, successCallback: Function, erro
         })
         .catch(error => {
             console.error(error);
-            errorCallback && errorCallback();
+            errorCallback && errorCallback(error.status);
         })
 };
 
