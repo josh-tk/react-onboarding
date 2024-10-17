@@ -1,11 +1,13 @@
 import React, {ReactElement, useEffect, useState} from 'react';
-import {AuthorType, CreateRecipeForm, IngredientType, OptionType} from '../../interfaces';
+import {AuthorType, IngredientType, OptionType} from '../../interfaces';
 import {CreateRecipeSchema} from "../../schemas";
 import {ErrorMessage, Field, Form, Formik} from 'formik';
 import SelectInput from "../../components/Select";
-import axios from "axios";
 import Loading from "../../components/Loading";
 import {authorToSelectOption, fromSelectOptions, toSelectOptions} from "../../formatters";
+import {createRecipe} from "../../http/recipes";
+import {indexIngredients} from "../../http/ingredients";
+import {indexUsers} from "../../http/users";
 
 const CreateRecipe = (): ReactElement => {
     // add types here
@@ -15,20 +17,15 @@ const CreateRecipe = (): ReactElement => {
     const [greatSuccess, setGreatSuccess] = useState(false);
 
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_BACKEND_API_HOST}/ingredients/list`)
-            .then(response => {
-                setIngredients(response.data.ingredients)
-            }).catch(error => {
-            console.error(error)
-        });
+        indexIngredients(
+            (data: IngredientType[]) => setIngredients(data),
+            () => console.error('error -> ', 'error')
+        );
 
-        axios.get(`${process.env.REACT_APP_BACKEND_API_HOST}/users/list`)
-            .then(response => {
-                setAuthors(response.data.users)
-            })
-            .catch(error => {
-                console.error(error)
-            })
+        indexUsers(
+            (data: AuthorType[]) => setAuthors(data),
+            () => console.error('error -> ', 'error')
+        );
     }, []);
 
     //todo: check if theres no error and null check instead of length check
@@ -50,18 +47,6 @@ const CreateRecipe = (): ReactElement => {
         // ensure Formik knows that we've selected a couple options in our custom select component
         setFieldValue('ingredients', selectedIngredients);
     };
-
-    const handleCreateRecipe = (formValues: CreateRecipeForm): void => {
-        axios.post(`${process.env.REACT_APP_BACKEND_API_HOST}/recipes/create`, formValues)
-            .then(response => {
-                if (response.status === 201) {
-                    setGreatSuccess(true);
-                }
-            })
-            .catch(error => {
-                console.error(error);
-            })
-    }
 
     if (loading) {
         return <Loading/>;
@@ -97,7 +82,11 @@ const CreateRecipe = (): ReactElement => {
                     author_id: ''
                 }}
                 validationSchema={CreateRecipeSchema}
-                onSubmit={(values) => handleCreateRecipe(values)}
+                onSubmit={(values) => createRecipe(
+                    values,
+                    () => setGreatSuccess(true),
+                    () => console.error('error')
+                )}
             >
                 {(formik) => (
                     <Form>

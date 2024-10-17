@@ -3,9 +3,11 @@ import {AuthorType, IngredientType, OptionType, ShowRecipeType, UpdateRecipeForm
 import {UpdateRecipeSchema} from "../../schemas";
 import {ErrorMessage, Field, Form, Formik} from 'formik';
 import SelectInput from "../../components/Select";
-import axios from "axios";
 import Loading from "../../components/Loading";
 import {authorToSelectOption, toSelectOptions} from "../../formatters";
+import {showRecipe, updateRecipe} from "../../http/recipes";
+import {indexUsers} from "../../http/users";
+import {indexIngredients} from "../../http/ingredients";
 
 const UpdateRecipe = (): ReactElement => {
     const [selectedRecipe, setSelectedRecipe] = useState<ShowRecipeType>(null);
@@ -22,30 +24,21 @@ const UpdateRecipe = (): ReactElement => {
             return;
         }
 
-        axios.get(`${process.env.REACT_APP_BACKEND_API_HOST}/recipes/${recipeId}`)
-            .then(response => {
-                console.log('data -> ', response.data);
-                setSelectedRecipe(response.data);
-            }).catch(error => {
-            if (error.response.status === 404) {
-                console.error('Recipe not found');
-            }
-        });
+        showRecipe(
+            recipeId,
+            (data: ShowRecipeType) => setSelectedRecipe(data),
+            () => console.error('error')
+        );
 
-        axios.get(`${process.env.REACT_APP_BACKEND_API_HOST}/ingredients/list`)
-            .then(response => {
-                setIngredients(response.data.ingredients);
-            }).catch(error => {
-            console.error(error);
-        });
+        indexIngredients(
+            (data: IngredientType[]) => setIngredients(data),
+            () => console.error('error')
+        );
 
-        axios.get(`${process.env.REACT_APP_BACKEND_API_HOST}/users/list`)
-            .then(response => {
-                setAuthors(response.data.users);
-            })
-            .catch(error => {
-                console.error(error);
-            });
+        indexUsers(
+            (data: AuthorType[]) => setAuthors(data),
+            () => console.error('error')
+        )
     }, []);
 
     useEffect(() => {
@@ -69,18 +62,6 @@ const UpdateRecipe = (): ReactElement => {
     const handleSelectAuthor = (setFieldValue: Function, selectedOption: OptionType): void => {
         // ensure Formik knows that we've selected an author in our custom select component
         setFieldValue('author_id', selectedOption.value);
-    }
-
-    const handleUpdateRecipe = (values: UpdateRecipeForm) => {
-        axios.patch(`${process.env.REACT_APP_BACKEND_API_HOST}/recipes/update`, values)
-            .then(response => {
-                if (response.status === 200) {
-                    setGreatSuccess(true);
-                }
-            })
-            .catch(error => {
-                console.error(error);
-            })
     }
 
     if (loading) {
@@ -108,7 +89,11 @@ const UpdateRecipe = (): ReactElement => {
                     author_id: selectedRecipe.author.id
                 }}
                 validationSchema={UpdateRecipeSchema}
-                onSubmit={(values: UpdateRecipeForm) => handleUpdateRecipe(values)}
+                onSubmit={(values: UpdateRecipeForm) => updateRecipe(
+                    values,
+                    () => setGreatSuccess(true),
+                    () => console.error('error')
+                )}
             >
                 {(formik) => (
                     <Form>
