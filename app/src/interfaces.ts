@@ -1,4 +1,4 @@
-import {BaseRecipeSchema, IdentifierSchema, RecipeSchema} from "./schemas";
+import {BaseRecipeSchema, IdentifierSchema, ShowRecipeSchema} from "./schemas";
 import {InferType as Schema} from "yup";
 
 /**
@@ -24,7 +24,7 @@ interface AuthorType extends Schema<typeof IdentifierSchema> {
 interface BaseRecipeType extends Schema<typeof BaseRecipeSchema> {
 }
 
-interface RecipeType extends Schema<typeof RecipeSchema> {
+interface ShowRecipeType extends Schema<typeof ShowRecipeSchema> {
 }
 
 interface OptionType {
@@ -32,4 +32,4 @@ interface OptionType {
     label: string;
 }
 
-export type {BaseRecipeType, RecipeType, IngredientType, AuthorType, OptionType};
+export type {BaseRecipeType, ShowRecipeType, IngredientType, AuthorType, OptionType};

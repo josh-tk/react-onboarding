@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {IngredientType, OptionType, RecipeType} from '../../interfaces';
-import {BaseRecipeSchema, CreateRecipeSchema, IdentifierSchema} from "../../schemas";
-import {Formik, Form, Field, ErrorMessage} from 'formik';
+import {OptionType} from '../../interfaces';
+import {CreateRecipeSchema} from "../../schemas";
+import {ErrorMessage, Field, Form, Formik} from 'formik';
 import SelectInput from "../../components/Select";
 import axios from "axios";
 import Loading from "../../components/Loading";
@@ -117,7 +117,6 @@ const CreateRecipe = () => {
                 <Formik
                     initialValues={{
                         name: '',
-                        description: '',
                         ingredients: [],
                         author_id: ''
                     }}
@@ -130,12 +129,6 @@ const CreateRecipe = () => {
                                 <label htmlFor="name">Title</label>
                                 <Field id="name" name="name" placeholder="Title"/>
                                 <ErrorMessage name="name" component="div"/>
-                            </div>
-
-                            <div>
-                                <label htmlFor="description">Description</label>
-                                <Field id="description" name="description" placeholder="Description"/>
-                                <ErrorMessage name="description" component="div"/>
                             </div>
 
                             <div>

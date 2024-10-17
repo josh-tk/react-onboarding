@@ -1,8 +1,8 @@
-import {JSX, useState, useEffect} from "react";
+import {JSX, useEffect, useState} from "react";
 import axios from "axios";
 import Recipe from "../../components/Recipe";
 import Loading from "../../components/Loading";
-import {RecipeType} from "../../interfaces";
+import {ShowRecipeType} from "../../interfaces";
 
 const RecipeList = (): JSX.Element => {
     const [loading, setLoading] = useState(true);
@@ -17,10 +17,10 @@ const RecipeList = (): JSX.Element => {
                 setRecipes(response.data.recipes);
                 setLoading(false);
             }).catch((error) => {
-                console.error(error);
-                setError(error);
-                setLoading(false);
-            })
+            console.error(error);
+            setError(error);
+            setLoading(false);
+        })
     }, []);
 
     if (loading) {
@@ -37,7 +37,7 @@ const RecipeList = (): JSX.Element => {
 
     return (
         <div className={'recipe-list'}>
-            {recipes.map((recipe: RecipeType) => <Recipe key={recipe.id} recipe={recipe}/>)}
+            {recipes.map((recipe: ShowRecipeType) => <Recipe key={recipe.id} recipe={recipe}/>)}
         </div>
     );
 }

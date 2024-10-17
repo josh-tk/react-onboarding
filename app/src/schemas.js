@@ -19,21 +19,28 @@ let IdentifierSchema = yup.object({
 
 let BaseRecipeSchema = yup.object({
     name: yup.string().required(),
-    description: yup.string().required(),
+    ingredients: yup.array().of(IdentifierSchema).required(),
+    author: IdentifierSchema.required(),
+});
+
+let ShowRecipeSchema = yup.object({
+    id: yup.string().required(),
+    name: yup.string().required(),
     ingredients: yup.array().of(IdentifierSchema).required(),
     author: IdentifierSchema.required(),
 });
 
 let CreateRecipeSchema = yup.object({
     name: yup.string().required(),
-    description: yup.string().required(),
     ingredients: yup.array().of(IdentifierSchema).required(),
     author_id: yup.string().required(),
 });
 
-// extend BaseRecipeSchema with an ID field (used for viewing, updating and deleting)
-let RecipeSchema = BaseRecipeSchema.shape({
+let UpdateRecipeSchema = yup.object({
     id: yup.string().required(),
-});
+    name: yup.string().required(),
+    ingredients: yup.array().of(IdentifierSchema).required(),
+    author_id: yup.string().required(),
+})
 
-export { IdentifierSchema, BaseRecipeSchema, CreateRecipeSchema, RecipeSchema };
+export {IdentifierSchema, ShowRecipeSchema, BaseRecipeSchema, CreateRecipeSchema, UpdateRecipeSchema};

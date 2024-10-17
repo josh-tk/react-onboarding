@@ -1,8 +1,8 @@
 import React, {ReactElement, ReactNode} from 'react';
-import {RecipeType, IngredientType} from "../interfaces";
+import {IngredientType, ShowRecipeType} from "../interfaces";
 import Ingredient from "./Ingredient";
 
-const Recipe = ({recipe}: { recipe: RecipeType }): ReactElement => {
+const Recipe = ({recipe}: { recipe: ShowRecipeType }): ReactElement => {
     return (
         <div className="recipe">
             <h2>{recipe.name}</h2>
@@ -14,7 +14,7 @@ const Recipe = ({recipe}: { recipe: RecipeType }): ReactElement => {
                     </li>
                 ))}
             </ul>
-            <p>{recipe.description}</p>
+            <a href={`/recipes/update/${recipe.id}`}>Edit</a>
         </div>
     );
 };
