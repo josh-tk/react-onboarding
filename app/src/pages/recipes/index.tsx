@@ -1,8 +1,10 @@
-import {JSX, useEffect, useState} from "react";
+import React, {JSX, useEffect, useState} from "react";
 import axios from "axios";
 import Recipe from "../../components/Recipe";
-import Loading from "../../components/Loading";
 import {ShowRecipeType} from "../../interfaces";
+import {FormattedText, Spinner} from "@travelperksl/suitcase";
+import styled from "styled-components";
+import {Link} from "react-router-dom";
 
 const RecipeList = (): JSX.Element => {
     const [loading, setLoading] = useState(true);
@@ -24,7 +26,8 @@ const RecipeList = (): JSX.Element => {
     }, []);
 
     if (loading) {
-        return <Loading/>;
+        return <Spinner type={'primary'} size={'medium'}
+                        text={<FormattedText>Granting Universal Benevolence...</FormattedText>}/>;
     }
 
     if (error !== null) {
@@ -35,10 +38,23 @@ const RecipeList = (): JSX.Element => {
         return <p>No recipes found. <a href="/recipes/create">Create one.</a></p>;
     }
 
+    const Column = styled.div`
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 1em;
+    `;
+
     return (
-        <div className={'recipe-list'}>
+        <Column>
+            <Link to={'/recipes/create'}>
+                <FormattedText>
+                    Create a new recipe
+                </FormattedText>
+            </Link>
+
             {recipes.map((recipe: ShowRecipeType) => <Recipe key={recipe.id} recipe={recipe}/>)}
-        </div>
+        </Column>
     );
 }
 

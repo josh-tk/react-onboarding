@@ -3,21 +3,21 @@ import {AuthorType, IngredientType, OptionType, ShowRecipeType, UpdateRecipeForm
 import {UpdateRecipeSchema} from "../../schemas";
 import {ErrorMessage, Field, Form, Formik} from 'formik';
 import SelectInput from "../../components/Select";
-import Loading from "../../components/Loading";
 import {authorToSelectOption, toSelectOptions} from "../../formatters";
 import {showRecipe, updateRecipe} from "../../http/recipes";
 import useHandleError from "../../http/handleError";
 import {indexIngredients} from "../../http/ingredients";
 import {indexUsers} from "../../http/users";
-import {Button} from '@travelperksl/suitcase'
+import {Button, Flex, FormattedText, Spinner, TextLink, useToast} from '@travelperksl/suitcase'
+import styled from "styled-components";
 
 const UpdateRecipe = ({match}): ReactElement => {
     const [selectedRecipe, setSelectedRecipe] = useState<ShowRecipeType>(null);
     const [ingredients, setIngredients] = useState<IngredientType[]>([]);
     const [authors, setAuthors] = useState<AuthorType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [greatSuccess, setGreatSuccess] = useState<boolean>(false);
     const [requestCount, setRequestCount] = useState<number>(0);
+    const addToast = useToast();
     const {handleError} = useHandleError();
 
     const handleSuccessfulRequest = (setState: Function, data: ShowRecipeType | IngredientType[] | AuthorType[]): void => {
@@ -58,8 +58,9 @@ const UpdateRecipe = ({match}): ReactElement => {
     }, [loading]);
 
     useEffect(() => {
+        // ps sorry for the setTimeout, I'm not proud of it either
         if (requestCount === 3) {
-            setLoading(false);
+            setTimeout(() => setLoading(false), 500);
         }
     }, [requestCount]);
 
@@ -81,73 +82,88 @@ const UpdateRecipe = ({match}): ReactElement => {
     }
 
     if (loading) {
-        return <Loading/>;
+        return <Spinner type={'primary'} size={'medium'}
+                        text={<FormattedText>Gasting Flabbers...</FormattedText>}/>;
     }
 
-    if (greatSuccess) {
-        return <p>Great success! <a href="/recipes">View your recipes</a>. High Five!</p>;
-    }
+    const CardBodySpacer = styled.div`
+        padding: 24px;
+        width: 50%;
+    `
+
+    const FieldSet = styled.div`
+        margin: 1em 0;
+    `
 
     return (
         <div>
-            <h1>Update Recipe</h1>
 
-            {/*
-                while formik is great at supporting validation schemas
-                it doesn't directly support Interfaces. We'll use the yup object
-                directly here, and the interface which extends yup everywhere else.
-            */}
-            <Formik
-                initialValues={{
-                    id: selectedRecipe.id,
-                    name: selectedRecipe.name,
-                    ingredients: selectedRecipe.ingredients,
-                    author_id: selectedRecipe.author.id
-                }}
-                validationSchema={UpdateRecipeSchema}
-                onSubmit={(values: UpdateRecipeForm) => updateRecipe(
-                    values,
-                    () => setGreatSuccess(true),
-                    () => console.error('error')
-                )}
-            >
-                {(formik) => (
-                    <Form>
-                        <div>
-                            <label htmlFor="name">Title</label>
-                            <Field id="name" name="name" placeholder="Title"/>
-                            <ErrorMessage name="name" component="div"/>
-                        </div>
+            <Flex flexDirection={'column'}>
+                <TextLink to={'/recipes'}><FormattedText>Back to Recipes</FormattedText></TextLink>
+                <h1><FormattedText size={'displayXL'}>Update Recipe</FormattedText></h1>
+                <CardBodySpacer>
 
-                        <div>
-                            <SelectInput
-                                options={toSelectOptions(ingredients)}
-                                label={'Ingredients'}
-                                inputName={'ingredients'}
-                                isMulti={true}
-                                selectedOption={toSelectOptions(formik.values.ingredients)}
-                                setSelectedOption={
-                                    (selectedOptions: OptionType[]) => handleSelectIngredient(formik.setFieldValue, selectedOptions)
-                                }
-                            />
-                        </div>
+                    {/*
+                        while formik is great at supporting validation schemas
+                        it doesn't directly support Interfaces. We'll use the yup object
+                        directly here, and the interface which extends yup everywhere else.
+                    */}
+                    <Formik
+                        initialValues={{
+                            id: selectedRecipe.id,
+                            name: selectedRecipe.name,
+                            ingredients: selectedRecipe.ingredients,
+                            author_id: selectedRecipe.author.id
+                        }}
+                        validationSchema={UpdateRecipeSchema}
+                        onSubmit={(values: UpdateRecipeForm) => updateRecipe(
+                            values,
+                            () => addToast({
+                                message: 'Recipe Updated',
+                                variant: 'dismissable',
+                            }),
+                            () => console.error('error')
+                        )}
+                    >
+                        {(formik) => (
+                            <Form>
+                                <FieldSet>
+                                    <label htmlFor="name">Title</label>
+                                    <Field id="name" name="name" placeholder="Title"/>
+                                    <ErrorMessage name="name" component="div"/>
+                                </FieldSet>
 
-                        <div>
-                            <SelectInput
-                                options={toSelectOptions(authors)}
-                                label={'Author'}
-                                inputName={'author'}
-                                selectedOption={authorToSelectOption(formik.values.author_id, authors)}
-                                setSelectedOption={
-                                    (selectedOption: OptionType) => handleSelectAuthor(formik.setFieldValue, selectedOption)
-                                }
-                            />
-                        </div>
+                                <FieldSet>
+                                    <SelectInput
+                                        options={toSelectOptions(ingredients)}
+                                        label={'Ingredients'}
+                                        inputName={'ingredients'}
+                                        isMulti={true}
+                                        selectedOption={toSelectOptions(formik.values.ingredients)}
+                                        setSelectedOption={
+                                            (selectedOptions: OptionType[]) => handleSelectIngredient(formik.setFieldValue, selectedOptions)
+                                        }
+                                    />
+                                </FieldSet>
 
-                        <Button submit={true} size={"small"}>Update Recipe</Button>
-                    </Form>
-                )}
-            </Formik>
+                                <FieldSet>
+                                    <SelectInput
+                                        options={toSelectOptions(authors)}
+                                        label={'Author'}
+                                        inputName={'author'}
+                                        selectedOption={authorToSelectOption(formik.values.author_id, authors)}
+                                        setSelectedOption={
+                                            (selectedOption: OptionType) => handleSelectAuthor(formik.setFieldValue, selectedOption)
+                                        }
+                                    />
+                                </FieldSet>
+
+                                <Button submit={true} styleType={'primary'} size={"medium"}>Update Recipe</Button>
+                            </Form>
+                        )}
+                    </Formik>
+                </CardBodySpacer>
+            </Flex>
         </div>
     );
 };

@@ -1,10 +1,11 @@
 import React from 'react';
 import {IngredientType} from "../interfaces";
+import {FormattedText} from "@travelperksl/suitcase";
 
 const Ingredient = ({ingredient}: { ingredient: IngredientType }) => {
     return (
         <div className="ingredient">
-            <h3>{ingredient.name}</h3>
+            <FormattedText>{ingredient.name}</FormattedText>
         </div>
     );
 }

@@ -2,31 +2,80 @@ import React, {ReactElement, ReactNode} from 'react';
 import {IngredientType, ShowRecipeType} from "../interfaces";
 import Ingredient from "./Ingredient";
 import axios from "axios";
+import {Badge, Button, Card, Flex, FormattedText, useToast} from "@travelperksl/suitcase";
+import styled from "styled-components";
+import {Link} from "react-router-dom";
 
 const Recipe = ({recipe}: { recipe: ShowRecipeType }): ReactElement => {
+    const addToast = useToast();
+
     const handleDelete = (id: string): void => {
         axios.delete(`${process.env.REACT_APP_BACKEND_API_HOST}/recipes/${id}`)
             .then((response) => {
-                console.log(response);
+                addToast({
+                    message: 'Recipe Deleted successfully',
+                    variant: 'dismissable',
+                });
+
+                setTimeout(() => window.location.reload(), 1000);
             }).catch((error) => {
-            console.error(error);
+            addToast({
+                message: 'Failed to delete recipe, try again?',
+                variant: 'dismissable',
+            });
         });
     };
 
+    const List = styled.ul`
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: row;
+    `
+
+    const ListItem = styled.div`
+        list-style-type: none;
+        font-family: inherit;
+        margin: 1em;
+    `
+
+    const PaddedDiv = styled.div`
+        padding: 2em;
+    `;
+
+    const Seperator = styled.hr`
+        border: 1px solid #f0f0f0;
+        margin: 1em 0;
+    `;
+
     return (
-        <div className="recipe">
-            <h2>{recipe.name}</h2>
-            <h3>By {recipe.author.name}</h3>
-            <ul className="ingredients">
-                {recipe.ingredients.map((ingredient: IngredientType, index: number): ReactNode => (
-                    <li key={index}>
-                        <Ingredient ingredient={ingredient}/>
-                    </li>
-                ))}
-            </ul>
-            <a href={`/recipes/update/${recipe.id}`}>Edit</a>
-            <button type={'button'} onClick={(): void => handleDelete(recipe.id)}>Delete</button>
-        </div>
+        <>
+            <Seperator/>
+
+            <Card shadowDepth={'z3'} roundness={'borderRadiusMd'}>
+                <PaddedDiv>
+                    <FormattedText size={'displayM'}>{recipe.name}</FormattedText>
+                    <Badge colorPalette={'neutral'} text={recipe.author.name}/>
+                    <List>
+                        {recipe.ingredients.map((ingredient: IngredientType, index: number): ReactNode => (
+                            <ListItem key={index}>
+                                <Ingredient ingredient={ingredient}/>
+                            </ListItem>
+                        ))}
+                    </List>
+
+                    <Flex alignItems={'center'} alignContent={'space-between'}>
+                        <Link to={`/recipes/update/${recipe.id}`}>Edit</Link>
+                        <Button styleType={'danger'} onClick={(): void => handleDelete(recipe.id)}>
+                            <FormattedText>
+                                Delete
+                            </FormattedText>
+                        </Button>
+                    </Flex>
+                </PaddedDiv>
+
+            </Card>
+        </>
     );
 };
 
