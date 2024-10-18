@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {ReactElement} from 'react';
 import Select from 'react-select';
 
 // this is a dumb component that doesn't manage state
@@ -10,19 +10,19 @@ const SelectInput = ({
                          isMulti = false,
                          selectedOption,
                          setSelectedOption
-                     }) => {
-    return (
-        <div>
-            <label htmlFor={inputName}>{label}</label>
-            <Select
-                name={inputName}
-                isMulti={isMulti}
-                defaultValue={selectedOption}
-                onChange={setSelectedOption}
-                options={options}
-            />
-        </div>
-    );
-}
+                     }): ReactElement => (
+
+    <div>
+        <label htmlFor={inputName}>{label}</label>
+        <Select
+            name={inputName}
+            isMulti={isMulti}
+            defaultValue={selectedOption}
+            onChange={setSelectedOption}
+            options={options}
+        />
+    </div>
+);
+
 
 export default SelectInput;
