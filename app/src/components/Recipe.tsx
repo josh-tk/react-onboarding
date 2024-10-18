@@ -5,6 +5,7 @@ import axios from "axios";
 import {Badge, Button, Card, Flex, FormattedText, useToast} from "@travelperksl/suitcase";
 import styled from "styled-components";
 import {Link} from "react-router-dom";
+import {actions, errors, responses} from "../lang";
 
 const Recipe = ({recipe}: { recipe: ShowRecipeType }): ReactElement => {
     const addToast = useToast();
@@ -13,14 +14,14 @@ const Recipe = ({recipe}: { recipe: ShowRecipeType }): ReactElement => {
         axios.delete(`${process.env.REACT_APP_BACKEND_API_HOST}/recipes/${id}`)
             .then((response) => {
                 addToast({
-                    message: 'Recipe Deleted successfully',
+                    message: responses.recipeDeletedSuccess.defaultMessage,
                     variant: 'dismissable',
                 });
 
                 setTimeout(() => window.location.reload(), 1000);
             }).catch((error) => {
             addToast({
-                message: 'Failed to delete recipe, try again?',
+                message: errors.generic.defaultMessage,
                 variant: 'dismissable',
             });
         });
@@ -65,10 +66,14 @@ const Recipe = ({recipe}: { recipe: ShowRecipeType }): ReactElement => {
                     </List>
 
                     <Flex alignItems={'center'} alignContent={'space-between'}>
-                        <Link to={`/recipes/update/${recipe.id}`}>Edit</Link>
+                        <Link to={`/recipes/update/${recipe.id}`}>
+                            <FormattedText>
+                                {actions.edit.defaultMessage}
+                            </FormattedText>
+                        </Link>
                         <Button styleType={'danger'} onClick={(): void => handleDelete(recipe.id)}>
                             <FormattedText>
-                                Delete
+                                {actions.delete.defaultMessage}
                             </FormattedText>
                         </Button>
                     </Flex>

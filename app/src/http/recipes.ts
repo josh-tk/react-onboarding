@@ -12,17 +12,6 @@ const showRecipe = (recipe_id: string, successCallback: Function, errorCallback:
         });
 };
 
-const indexRecipes = (successCallback: Function, errorCallback: Function | null) => {
-    axios.get(`${process.env.REACT_APP_BACKEND_API_HOST}/recipes`)
-        .then(response => {
-            successCallback(response.data.recipes);
-        })
-        .catch(error => {
-            console.error(error);
-            errorCallback && errorCallback(error.status);
-        });
-};
-
 const updateRecipe = (payload: UpdateRecipeForm, successCallback: Function, errorCallback: Function | null) => {
     axios.patch(`${process.env.REACT_APP_BACKEND_API_HOST}/recipes/update`, payload)
         .then(response => {
@@ -49,4 +38,4 @@ const createRecipe = (payload: CreateRecipeForm, successCallback: Function, erro
         })
 };
 
-export {showRecipe, indexRecipes, createRecipe, updateRecipe};
+export {showRecipe, createRecipe, updateRecipe};

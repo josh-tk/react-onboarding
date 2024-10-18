@@ -10,6 +10,7 @@ import {indexIngredients} from "../../http/ingredients";
 import {indexUsers} from "../../http/users";
 import {Button, Flex, FormattedText, Spinner, TextLink, useToast} from '@travelperksl/suitcase'
 import styled from "styled-components";
+import {actions, form, fun, links, responses} from "../../lang";
 
 const UpdateRecipe = ({match}): ReactElement => {
     const [selectedRecipe, setSelectedRecipe] = useState<ShowRecipeType>(null);
@@ -82,8 +83,11 @@ const UpdateRecipe = ({match}): ReactElement => {
     }
 
     if (loading) {
-        return <Spinner type={'primary'} size={'medium'}
-                        text={<FormattedText>Gasting Flabbers...</FormattedText>}/>;
+        return <Spinner
+            type={'primary'}
+            size={'medium'}
+            text={<FormattedText>{fun.loadingThree.defaultMessage}</FormattedText>}
+        />;
     }
 
     const CardBodySpacer = styled.div`
@@ -99,8 +103,8 @@ const UpdateRecipe = ({match}): ReactElement => {
         <div>
 
             <Flex flexDirection={'column'}>
-                <TextLink to={'/recipes'}><FormattedText>Back to Recipes</FormattedText></TextLink>
-                <h1><FormattedText size={'displayXL'}>Update Recipe</FormattedText></h1>
+                <TextLink to={'/recipes'}><FormattedText>{links.backToList.defaultMessage}</FormattedText></TextLink>
+                <h1><FormattedText size={'displayXL'}>{actions.createTitle.defaultMessage}</FormattedText></h1>
                 <CardBodySpacer>
 
                     {/*
@@ -119,16 +123,19 @@ const UpdateRecipe = ({match}): ReactElement => {
                         onSubmit={(values: UpdateRecipeForm) => updateRecipe(
                             values,
                             () => addToast({
-                                message: 'Recipe Updated',
+                                message: responses.recipeUpdatedSuccess.defaultMessage,
                                 variant: 'dismissable',
                             }),
-                            () => console.error('error')
+                            () => addToast({
+                                message: responses.recipeUpdatedError.defaultMessage,
+                                variant: 'dismissable',
+                            })
                         )}
                     >
                         {(formik) => (
                             <Form>
                                 <FieldSet>
-                                    <label htmlFor="name">Title</label>
+                                    <label htmlFor="name">{form.title.defaultMessage}</label>
                                     <Field id="name" name="name" placeholder="Title"/>
                                     <ErrorMessage name="name" component="div"/>
                                 </FieldSet>
@@ -136,7 +143,7 @@ const UpdateRecipe = ({match}): ReactElement => {
                                 <FieldSet>
                                     <SelectInput
                                         options={toSelectOptions(ingredients)}
-                                        label={'Ingredients'}
+                                        label={form.ingredients.defaultMessage}
                                         inputName={'ingredients'}
                                         isMulti={true}
                                         selectedOption={toSelectOptions(formik.values.ingredients)}
@@ -149,7 +156,7 @@ const UpdateRecipe = ({match}): ReactElement => {
                                 <FieldSet>
                                     <SelectInput
                                         options={toSelectOptions(authors)}
-                                        label={'Author'}
+                                        label={form.author.defaultMessage}
                                         inputName={'author'}
                                         selectedOption={authorToSelectOption(formik.values.author_id, authors)}
                                         setSelectedOption={
@@ -158,7 +165,11 @@ const UpdateRecipe = ({match}): ReactElement => {
                                     />
                                 </FieldSet>
 
-                                <Button submit={true} styleType={'primary'} size={"medium"}>Update Recipe</Button>
+                                <Button submit={true} styleType={'primary'} size={"medium"}>
+                                    <FormattedText>
+                                        {actions.edit.defaultMessage}
+                                    </FormattedText>
+                                </Button>
                             </Form>
                         )}
                     </Formik>

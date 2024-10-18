@@ -5,6 +5,7 @@ import {ShowRecipeType} from "../../interfaces";
 import {FormattedText, Spinner} from "@travelperksl/suitcase";
 import styled from "styled-components";
 import {Link} from "react-router-dom";
+import {errors, fun, links, responses} from "../../lang";
 
 const RecipeList = (): JSX.Element => {
     const [loading, setLoading] = useState(true);
@@ -26,16 +27,28 @@ const RecipeList = (): JSX.Element => {
     }, []);
 
     if (loading) {
-        return <Spinner type={'primary'} size={'medium'}
-                        text={<FormattedText>Granting Universal Benevolence...</FormattedText>}/>;
+        return <Spinner
+            type={'primary'}
+            size={'medium'}
+            text={<FormattedText>{fun.loadingTwo.defaultMessage}</FormattedText>}
+        />;
     }
 
     if (error !== null) {
-        return <p>Error: {error.message}</p>;
+        return <p>{errors.generic.defaultMessage}: {error.message}</p>;
     }
 
     if (recipes.length === 0 && loading === false) {
-        return <p>No recipes found. <a href="/recipes/create">Create one.</a></p>;
+        return (
+            <p>{
+                responses.recipesNotFound.defaultMessage}
+                <a href="/recipes/create">
+                    <FormattedText>
+                        {links.create.defaultMessage}
+                    </FormattedText>
+                </a>
+            </p>
+        );
     }
 
     const Column = styled.div`
@@ -49,7 +62,7 @@ const RecipeList = (): JSX.Element => {
         <Column>
             <Link to={'/recipes/create'}>
                 <FormattedText>
-                    Create a new recipe
+                    {links.create.defaultMessage}
                 </FormattedText>
             </Link>
 

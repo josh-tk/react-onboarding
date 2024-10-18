@@ -10,9 +10,9 @@ import {indexUsers} from "../../http/users";
 import useHandleError from "../../http/handleError";
 import {Button, Flex, FormattedText, Spinner, TextLink, useToast} from "@travelperksl/suitcase";
 import styled from "styled-components";
+import {actions, form, fun, links, responses} from "../../lang";
 
 const CreateRecipe = (): ReactElement => {
-    // add types here
     const [ingredients, setIngredients] = useState<IngredientType[]>([]);
     const [authors, setAuthors] = useState<AuthorType[]>([]);
     const [loading, setLoading] = useState(true);
@@ -72,7 +72,7 @@ const CreateRecipe = (): ReactElement => {
 
     if (loading) {
         return <Spinner type={'primary'} size={'medium'}
-                        text={<FormattedText>Warping Space-Time Continuum...</FormattedText>}/>;
+                        text={<FormattedText>{fun.loadingOne.defaultMessage}</FormattedText>}/>;
     }
 
     const CardBodySpacer = styled.div`
@@ -98,8 +98,8 @@ const CreateRecipe = (): ReactElement => {
         <div>
 
             <Flex flexDirection={'column'}>
-                <TextLink to={'/recipes'}><FormattedText>Back to Recipes</FormattedText></TextLink>
-                <h1><FormattedText size={'displayXL'}>Create a Recipe</FormattedText></h1>
+                <TextLink to={'/recipes'}><FormattedText>{links.backToList.defaultMessage}</FormattedText></TextLink>
+                <h1><FormattedText size={'displayXL'}>{links.create.defaultMessage}</FormattedText></h1>
                 <CardBodySpacer>
                     {/*
                         while formik is great at supporting validation schemas
@@ -116,16 +116,19 @@ const CreateRecipe = (): ReactElement => {
                         onSubmit={(values: CreateRecipeForm): void => createRecipe(
                             values,
                             () => addToast({
-                                message: 'Recipe Created',
+                                message: responses.recipeCreatedSuccess.defaultMessage,
                                 variant: 'dismissable',
                             }),
-                            () => console.error('error')
+                            () => addToast({
+                                message: responses.recipeCreatedError.defaultMessage,
+                                variant: 'dismissable',
+                            })
                         )}
                     >
                         {(formik) => (
                             <Form>
                                 <FieldSet>
-                                    <label htmlFor="name">Title</label>
+                                    <label htmlFor="name">{form.title.defaultMessage}</label>
                                     <Field id="name" name="name" placeholder="Title"/>
                                     <ErrorMessage name="name" component="div"/>
                                 </FieldSet>
@@ -133,7 +136,7 @@ const CreateRecipe = (): ReactElement => {
                                 <FieldSet>
                                     <SelectInput
                                         options={toSelectOptions(ingredients)}
-                                        label={'Ingredients'}
+                                        label={form.ingredients.defaultMessage}
                                         inputName={'ingredients'}
                                         isMulti={true}
                                         selectedOption={toSelectOptions(formik.values.ingredients)}
@@ -146,7 +149,7 @@ const CreateRecipe = (): ReactElement => {
                                 <FieldSet>
                                     <SelectInput
                                         options={toSelectOptions(authors)}
-                                        label={'Author'}
+                                        label={form.author.defaultMessage}
                                         inputName={'author'}
                                         selectedOption={authorToSelectOption(formik.values.author_id, authors)}
                                         setSelectedOption={
@@ -155,7 +158,11 @@ const CreateRecipe = (): ReactElement => {
                                     />
                                 </FieldSet>
 
-                                <Button submit={true} styleType={'primary'} size={"medium"}>Create Recipe</Button>
+                                <Button submit={true} styleType={'primary'} size={"medium"}>
+                                    <FormattedText>
+                                        {actions.create.defaultMessage}
+                                    </FormattedText>
+                                </Button>
                             </Form>
                         )}
                     </Formik>

@@ -5,32 +5,39 @@ import CreateRecipe from './recipes/create';
 import UpdateRecipe from './recipes/update';
 import ResourceNotFound from './resourceNotFound';
 import {Banner, FormattedText, ToastsContainer} from "@travelperksl/suitcase";
+import {errors, fun} from "../lang";
 
 const App: React.FC = (): ReactElement => {
     return (
         <Router>
-            <Switch>
-                <ToastsContainer>
-                    <Banner
-                        colorScheme="decorative1"
-                        text={<FormattedText>Warning: This app is hella ugly</FormattedText>}
-                    />
+            <ToastsContainer>
+                <Banner
+                    colorScheme="decorative1"
+                    text={<FormattedText>{fun.uglyUIAlert.defaultMessage}</FormattedText>}
+                />
 
-                    {/* for this app, root route is /recipes, not / (didn't want to create a home page)*/}
+                <Switch>
+                    {/* Redirect root path to /recipes */}
                     <Route exact path="/">
                         <Redirect to="/recipes"/>
                     </Route>
 
+                    {/* Define your routes */}
                     <Route exact path="/recipes" component={RecipeList}/>
                     <Route exact path="/recipes/create" component={CreateRecipe}/>
                     <Route exact path="/recipes/update/:id" component={UpdateRecipe}/>
-                </ToastsContainer>
 
-                {/* Error pages */}
-                <Route exact path='/error'
-                       render={() => <h1>Something went wrong. Maybe try refreshing the page</h1>}/>
-                <Route component={ResourceNotFound}/>
-            </Switch>
+                    {/* Error pages */}
+                    <Route exact path="/error"
+                           render={() => <h1>{errors.generic.defaultMessage}</h1>}/>
+
+                    {/* 404 Not Found route, must be last */}
+                    <Route exact path="/404" component={ResourceNotFound}/>
+
+                    {/* Catch-all route for undefined paths */}
+                    <Route component={ResourceNotFound}/>
+                </Switch>
+            </ToastsContainer>
         </Router>
     );
 };
