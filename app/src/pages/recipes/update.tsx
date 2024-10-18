@@ -17,7 +17,13 @@ const UpdateRecipe = ({match}): ReactElement => {
     const [authors, setAuthors] = useState<AuthorType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [greatSuccess, setGreatSuccess] = useState<boolean>(false);
+    const [requestCount, setRequestCount] = useState<number>(0);
     const {handleError} = useHandleError();
+
+    const handleSuccessfulRequest = (setState: Function, data: ShowRecipeType | IngredientType[] | AuthorType[]): void => {
+        setRequestCount((prevState) => prevState + 1);
+        setState(data);
+    }
 
     useEffect(() => {
         if (!loading) {
@@ -36,26 +42,26 @@ const UpdateRecipe = ({match}): ReactElement => {
         // you need to use the hook in a component
         showRecipe(
             recipeId,
-            (data: ShowRecipeType) => setSelectedRecipe(data),
+            (data: ShowRecipeType) => handleSuccessfulRequest(setSelectedRecipe, data),
             (errorCode: number) => handleError(errorCode)
         );
 
         indexIngredients(
-            (data: IngredientType[]) => setIngredients(data),
+            (data: IngredientType[]) => handleSuccessfulRequest(setIngredients, data),
             (errorCode: number) => handleError(errorCode)
         );
 
         indexUsers(
-            (data: AuthorType[]) => setAuthors(data),
+            (data: AuthorType[]) => handleSuccessfulRequest(setAuthors, data),
             (errorCode: number) => handleError(errorCode)
         )
     }, [loading]);
 
     useEffect(() => {
-        if (selectedRecipe !== null && loading) {
+        if (requestCount === 3) {
             setLoading(false);
         }
-    }, [selectedRecipe, loading]);
+    }, [requestCount]);
 
     const handleSelectIngredient = (setFieldValue: Function, selectedOptions: OptionType[]): void => {
         // ensure Formik knows that we've selected a couple options in our custom select component
