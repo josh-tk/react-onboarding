@@ -16,25 +16,44 @@ const CreateRecipe = (): ReactElement => {
     const [authors, setAuthors] = useState<AuthorType[]>([]);
     const [loading, setLoading] = useState(true);
     const [greatSuccess, setGreatSuccess] = useState(false);
+    const [requestCount, setRequestCount] = useState(0);
     const {handleError} = useHandleError();
 
+    const handleGetIngredients = (data: IngredientType[]): void => {
+        setIngredients(data);
+        setRequestCount((prevState) => prevState + 1);
+    }
+
+    const handleGetAuthors = (data: AuthorType[]): void => {
+        setAuthors(data);
+        setRequestCount((prevState) => prevState + 1);
+    }
+
     useEffect(() => {
+        if (!loading) {
+            return;
+        }
+
         indexIngredients(
-            (data: IngredientType[]) => setIngredients(data),
+            (data: IngredientType[]) => handleGetIngredients(data),
             (errorCode: number) => handleError(errorCode)
         );
 
         indexUsers(
-            (data: AuthorType[]) => setAuthors(data),
+            (data: AuthorType[]) => handleGetAuthors(data),
             (errorCode: number) => handleError(errorCode)
         );
-    }, [handleError]);
+    }, [loading]);
 
     useEffect(() => {
-        if (ingredients.length > 0 && authors.length > 0) {
+        // since we have two separate requests, we need to wait for both to finish
+        // so keep track of them independently via counter. When it's 2, we're ready.
+
+        // if you can think of a better way of programming this, please let me know
+        if (requestCount === 2) {
             setLoading(false);
         }
-    }, [ingredients, authors]);
+    }, [requestCount]);
 
     const handleSelectAuthor = (setFieldValue: Function, selectedOption: OptionType): void => {
         // ensure Formik knows that we've selected an author in our custom select component

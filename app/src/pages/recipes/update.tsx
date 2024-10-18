@@ -9,8 +9,9 @@ import {showRecipe, updateRecipe} from "../../http/recipes";
 import useHandleError from "../../http/handleError";
 import {indexIngredients} from "../../http/ingredients";
 import {indexUsers} from "../../http/users";
+import {Button} from '@travelperksl/suitcase'
 
-const UpdateRecipe = (): ReactElement => {
+const UpdateRecipe = ({match}): ReactElement => {
     const [selectedRecipe, setSelectedRecipe] = useState<ShowRecipeType>(null);
     const [ingredients, setIngredients] = useState<IngredientType[]>([]);
     const [authors, setAuthors] = useState<AuthorType[]>([]);
@@ -23,9 +24,8 @@ const UpdateRecipe = (): ReactElement => {
             return;
         }
 
-        const recipeId = window.location.pathname.split('/').pop();
+        const recipeId = match.params.id;
 
-        // todo: client side 404 page
         if (recipeId === null) {
             handleError(404);
         }
@@ -138,7 +138,7 @@ const UpdateRecipe = (): ReactElement => {
                             />
                         </div>
 
-                        <button type="submit">Submit</button>
+                        <Button submit={true} size={"small"}>Update Recipe</Button>
                     </Form>
                 )}
             </Formik>
