@@ -1,0 +1,36 @@
+services:
+  app:
+    container_name: frontend
+    build:
+      context: .
+      dockerfile: docker/react/dev.Dockerfile
+    # Set environment variables based on the .env file
+    env_file:
+      - .env
+    volumes:
+      - ./app:/app
+    restart: always
+    ports:
+      - 3000:3000
+    networks:
+      - onboarding_global
+    command: npm run start
+
+  nginx:
+    container_name: proxy
+    build:
+      context: .
+      dockerfile: docker/nginx/dev.Dockerfile
+    volumes:
+      - ./app/public:/app/public
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    networks:
+      - onboarding_global
+    command: sh -c 'while ! nc -z frontend 3000; do sleep 1; done; nginx -g "daemon off;"'
+
+networks:
+  onboarding_global:
+    external: true
